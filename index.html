@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com https://esm.sh; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https://picsum.photos https://fastly.picsum.photos; connect-src 'self' https://esm.sh;" />
+    <meta name="referrer" content="strict-origin-when-cross-origin" />
+    <title>RentFlow SaaS Architect</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+      body {
+        font-family: 'Inter', sans-serif;
+      }
+      code, pre {
+        font-family: 'JetBrains Mono', monospace;
+      }
+      @keyframes progress-indeterminate {
+        0% { transform: translateX(-100%) scaleX(0.2); }
+        50% { transform: translateX(0%) scaleX(0.5); }
+        100% { transform: translateX(100%) scaleX(0.2); }
+      }
+      .animate-progress-indeterminate {
+        animation: progress-indeterminate 1.5s infinite linear;
+      }
+    </style>
+  <script type="importmap">
+{
+  "imports": {
+    "react": "https://esm.sh/react@^19.2.4",
+    "react-dom/": "https://esm.sh/react-dom@^19.2.4/",
+    "react/": "https://esm.sh/react@^19.2.4/",
+    "lucide-react": "https://esm.sh/lucide-react@^0.566.0",
+    "recharts": "https://esm.sh/recharts@^3.7.0"
+  }
+}
+</script>
+<link rel="stylesheet" href="/index.css">
+</head>
+  <body class="bg-slate-50 text-slate-900 h-screen overflow-hidden">
+    <div id="root" class="h-full"></div>
+    <script type="module" src="/index.tsx"></script>
+  </body>
+</html>
