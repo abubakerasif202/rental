@@ -76,6 +76,9 @@ CREATE TABLE vehicles (
     vin VARCHAR(17) UNIQUE NOT NULL,
     current_mileage INTEGER DEFAULT 0,
     fuel_type VARCHAR(20) DEFAULT 'petrol', -- petrol, diesel, electric, hybrid
+    engine_type VARCHAR(50), -- e.g. 2.0L I4, 3.0L V6
+    transmission VARCHAR(20), -- Automatic, Manual
+    seats INTEGER DEFAULT 5,
     status vehicle_status DEFAULT 'available',
     daily_rate DECIMAL(10, 2) NOT NULL, -- Base rate
     last_service_date DATE,
@@ -198,12 +201,12 @@ CREATE INDEX idx_audit_tenant_date ON audit_logs(tenant_id, created_at DESC);
 
 // Mock Data
 export const MOCK_VEHICLES: Vehicle[] = [
-  { id: '1', make: 'Toyota', model: 'Camry', year: 2023, plate: 'NSW-123', status: VehicleStatus.RENTED, mileage: 15420, fuelLevel: 45 },
-  { id: '2', make: 'Hyundai', model: 'i30', year: 2022, plate: 'VIC-456', status: VehicleStatus.AVAILABLE, mileage: 32100, fuelLevel: 100 },
-  { id: '3', make: 'Tesla', model: 'Model 3', year: 2024, plate: 'QLD-789', status: VehicleStatus.AVAILABLE, mileage: 5000, fuelLevel: 80 },
-  { id: '4', make: 'Ford', model: 'Ranger', year: 2021, plate: 'WA-321', status: VehicleStatus.MAINTENANCE, mileage: 56000, fuelLevel: 20 },
-  { id: '5', make: 'Kia', model: 'Carnival', year: 2023, plate: 'SA-654', status: VehicleStatus.RENTED, mileage: 12000, fuelLevel: 60 },
-  { id: '6', make: 'Toyota', model: 'Corolla', year: 2023, plate: 'TAS-999', status: VehicleStatus.RENTED, mileage: 8000, fuelLevel: 90 },
+  { id: '1', make: 'Toyota', model: 'Camry', year: 2023, plate: 'NSW-123', status: VehicleStatus.RENTED, mileage: 15420, fuelLevel: 45, engineType: '2.5L I4', transmission: 'Automatic', seats: 5 },
+  { id: '2', make: 'Hyundai', model: 'i30', year: 2022, plate: 'VIC-456', status: VehicleStatus.AVAILABLE, mileage: 32100, fuelLevel: 100, engineType: '2.0L I4', transmission: 'Automatic', seats: 5 },
+  { id: '3', make: 'Tesla', model: 'Model 3', year: 2024, plate: 'QLD-789', status: VehicleStatus.AVAILABLE, mileage: 5000, fuelLevel: 80, engineType: 'Electric', transmission: 'Automatic', seats: 5 },
+  { id: '4', make: 'Ford', model: 'Ranger', year: 2021, plate: 'WA-321', status: VehicleStatus.MAINTENANCE, mileage: 56000, fuelLevel: 20, engineType: '2.0L Bi-Turbo Diesel', transmission: 'Automatic', seats: 5 },
+  { id: '5', make: 'Kia', model: 'Carnival', year: 2023, plate: 'SA-654', status: VehicleStatus.RENTED, mileage: 12000, fuelLevel: 60, engineType: '2.2L Diesel', transmission: 'Automatic', seats: 8 },
+  { id: '6', make: 'Toyota', model: 'Corolla', year: 2023, plate: 'TAS-999', status: VehicleStatus.RENTED, mileage: 8000, fuelLevel: 90, engineType: '1.8L Hybrid', transmission: 'Automatic', seats: 5 },
 ];
 
 export const MOCK_RENTALS: Rental[] = [

@@ -14,6 +14,9 @@ export interface Vehicle {
   status: VehicleStatus;
   mileage: number;
   fuelLevel: number;
+  engineType: string;
+  transmission: 'Automatic' | 'Manual';
+  seats: number;
 }
 
 export interface Rental {

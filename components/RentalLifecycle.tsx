@@ -85,6 +85,18 @@ await db.$transaction([
   db.vehicles.update({
     where: { id: rental.vehicleId },
     data: { status: 'Rented' }
+  }),
+  // 3. Audit Log for Compliance
+  db.auditLogs.create({
+    data: {
+      tenantId: rental.tenantId,
+      actorId: req.userId,
+      entityType: 'rental',
+      entityId: rentalId,
+      action: 'status_change',
+      oldValues: { status: 'Pending' },
+      newValues: { status: 'Active' }
+    }
   })
 ]);`
     },
@@ -108,6 +120,19 @@ for (const rental of overdueRentals) {
   await db.rentals.update({
     where: { id: rental.id },
     data: { status: 'Overdue' }
+  });
+  
+  // Audit Log (System Action)
+  await db.auditLogs.create({
+    data: {
+      tenantId: rental.tenantId,
+      entityType: 'rental',
+      entityId: rental.id,
+      action: 'status_change',
+      oldValues: { status: 'Active' },
+      newValues: { status: 'Overdue' },
+      notes: 'Automated system transition'
+    }
   });
   
   // Trigger Alert
@@ -153,18 +178,30 @@ await stripe.paymentIntents.create({
 await stripe.paymentIntents.cancel(rental.depositTransactionId);
 
 // 3. Close Loop
-await db.rentals.update({
-  where: { id: rentalId },
-  data: { status: 'Completed', finalTotal: finalTotal }
-});
-
-await db.vehicles.update({
-  where: { id: rental.vehicleId },
-  data: { 
-    status: 'Available', 
-    currentMileage: req.endMileage 
-  }
-});`
+await db.$transaction([
+  db.rentals.update({
+    where: { id: rentalId },
+    data: { status: 'Completed', finalTotal: finalTotal }
+  }),
+  db.vehicles.update({
+    where: { id: rental.vehicleId },
+    data: { 
+      status: 'Available', 
+      currentMileage: req.endMileage 
+    }
+  }),
+  db.auditLogs.create({
+    data: {
+      tenantId: rental.tenantId,
+      actorId: req.userId,
+      entityType: 'rental',
+      entityId: rentalId,
+      action: 'status_change',
+      oldValues: { status: 'Active' },
+      newValues: { status: 'Completed' }
+    }
+  })
+]);`
     }
   ];
 
