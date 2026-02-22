@@ -6,6 +6,8 @@ async function startServer() {
   const app = express();
   const PORT = 3000;
 
+  app.use(express.json());
+
   // Start background jobs
   startRentalReminderJob();
 
@@ -24,6 +26,29 @@ async function startServer() {
     } catch (err) {
       res.status(500).json({ success: false, error: String(err) });
     }
+  });
+
+  app.post("/api/bookings/confirm", (req, res) => {
+    const { email, clientName, vehicle, dates, total, saveCard } = req.body;
+    
+    console.log("==================================================");
+    console.log("CONFIRMATION EMAIL SENT");
+    console.log(`To: ${email}`);
+    console.log(`Subject: Your RentFlow Booking Confirmation`);
+    console.log("");
+    console.log(`Hi ${clientName},`);
+    console.log("");
+    console.log(`Your booking for the ${vehicle} is confirmed!`);
+    console.log(`Dates: ${dates}`);
+    console.log(`Total Amount: $${total}`);
+    if (saveCard) {
+      console.log("Note: Customer requested to save card for future payments.");
+    }
+    console.log("");
+    console.log("Thank you for choosing RentFlow!");
+    console.log("==================================================");
+
+    res.json({ success: true, message: "Confirmation email sent" });
   });
 
   // Vite middleware for development

@@ -1,8 +1,8 @@
 export enum VehicleStatus {
-  AVAILABLE = 'Available',
-  RENTED = 'Rented',
-  MAINTENANCE = 'Maintenance',
-  DECOMMISSIONED = 'Decommissioned',
+  AVAILABLE = "Available",
+  RENTED = "Rented",
+  MAINTENANCE = "Maintenance",
+  DECOMMISSIONED = "Decommissioned",
 }
 
 export interface Vehicle {
@@ -10,23 +10,31 @@ export interface Vehicle {
   make: string;
   model: string;
   year: number;
-  plate: string;
+  color: string;
+  licensePlate: string;
+  vin: string;
+  fuelType: string;
   status: VehicleStatus;
   mileage: number;
   fuelLevel: number;
   engineType: string;
-  transmission: 'Automatic' | 'Manual';
+  transmission: "Automatic" | "Manual";
   seats: number;
+  tankCapacity: number; // in liters
+  features: string[];
 }
 
 export interface Rental {
   id: string;
   clientName: string;
+  clientEmail?: string;
+  clientPhone?: string;
   vehicleId: string;
   startDate: string;
   endDate: string;
   durationDays: number;
-  status: 'Active' | 'Pending' | 'Completed' | 'Late';
+  estimatedReturnDate?: string;
+  status: "Active" | "Pending" | "Completed" | "Late";
   totalAmount: number;
 }
 

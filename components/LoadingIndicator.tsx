@@ -1,5 +1,5 @@
-import React from 'react';
-import { useLoading } from '../context/LoadingContext';
+import React from "react";
+import { useLoading } from "../context/LoadingContext";
 
 const LoadingIndicator: React.FC = () => {
   const { isLoading } = useLoading();
