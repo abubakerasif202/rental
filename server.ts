@@ -2,6 +2,22 @@ import express from "express";
 import { createServer as createViteServer } from "vite";
 import { startRentalReminderJob } from "./jobs/rentalReminders";
 
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const PAYMENT_METHOD_REGEX = /^pm_[A-Za-z0-9]+$/;
+
+type BookingConfirmPayload = {
+  email?: unknown;
+  clientName?: unknown;
+  vehicle?: unknown;
+  dates?: unknown;
+  total?: unknown;
+  saveCard?: unknown;
+  paymentMethodId?: unknown;
+};
+
+const isNonEmptyString = (value: unknown): value is string =>
+  typeof value === "string" && value.trim().length > 0;
+
 async function startServer() {
   const app = express();
   const PORT = 3000;
@@ -29,7 +45,42 @@ async function startServer() {
   });
 
   app.post("/api/bookings/confirm", (req, res) => {
-    const { email, clientName, vehicle, dates, total, saveCard } = req.body;
+    const { email, clientName, vehicle, dates, total, saveCard, paymentMethodId } =
+      (req.body ?? {}) as BookingConfirmPayload;
+
+    if (!isNonEmptyString(email) || !EMAIL_REGEX.test(email)) {
+      res.status(400).json({ success: false, message: "A valid email is required." });
+      return;
+    }
+    if (!isNonEmptyString(clientName)) {
+      res.status(400).json({ success: false, message: "Client name is required." });
+      return;
+    }
+    if (!isNonEmptyString(vehicle)) {
+      res.status(400).json({ success: false, message: "Vehicle is required." });
+      return;
+    }
+    if (!isNonEmptyString(dates)) {
+      res.status(400).json({ success: false, message: "Booking dates are required." });
+      return;
+    }
+
+    const parsedTotal =
+      typeof total === "number" ? total : typeof total === "string" ? Number(total) : NaN;
+    if (!Number.isFinite(parsedTotal) || parsedTotal <= 0) {
+      res.status(400).json({ success: false, message: "Total amount must be greater than 0." });
+      return;
+    }
+
+    if (!isNonEmptyString(paymentMethodId) || !PAYMENT_METHOD_REGEX.test(paymentMethodId)) {
+      res.status(400).json({
+        success: false,
+        message: "A valid Stripe payment method is required.",
+      });
+      return;
+    }
+
+    const shouldSaveCard = Boolean(saveCard);
     
     console.log("==================================================");
     console.log("CONFIRMATION EMAIL SENT");
@@ -40,8 +91,9 @@ async function startServer() {
     console.log("");
     console.log(`Your booking for the ${vehicle} is confirmed!`);
     console.log(`Dates: ${dates}`);
-    console.log(`Total Amount: $${total}`);
-    if (saveCard) {
+    console.log(`Total Amount: $${parsedTotal.toFixed(2)}`);
+    console.log(`Payment Method ID: ${paymentMethodId}`);
+    if (shouldSaveCard) {
       console.log("Note: Customer requested to save card for future payments.");
     }
     console.log("");
