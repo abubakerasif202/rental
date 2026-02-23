@@ -1,6 +1,7 @@
 import express from "express";
 import { createServer as createViteServer } from "vite";
 import { startRentalReminderJob } from "./jobs/rentalReminders";
+import { MOCK_VEHICLES, MOCK_RENTALS, MOCK_ALERTS } from "./constants";
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const PAYMENT_METHOD_REGEX = /^pm_[A-Za-z0-9]+$/;
@@ -32,10 +33,22 @@ async function startServer() {
     res.json({ status: "ok" });
   });
 
+  // Data endpoints
+  app.get("/api/vehicles", (req, res) => {
+    res.json(MOCK_VEHICLES);
+  });
+
+  app.get("/api/rentals", (req, res) => {
+    res.json(MOCK_RENTALS);
+  });
+
+  app.get("/api/alerts", (req, res) => {
+    res.json(MOCK_ALERTS);
+  });
+
   app.post("/api/jobs/trigger", async (req, res) => {
     console.log("Manual trigger of rental reminders job...");
     try {
-      // For demonstration, we just call the logic directly
       const { runRentalRemindersNow } = await import('./jobs/rentalReminders');
       await runRentalRemindersNow();
       res.json({ success: true, message: "Job executed successfully" });
