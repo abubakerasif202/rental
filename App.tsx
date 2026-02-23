@@ -27,7 +27,7 @@ import Booking from "./components/Booking";
 import { Calendar } from "lucide-react";
 
 // Navigation State Enum
-enum Tab {
+export enum Tab {
   DASHBOARD = "DASHBOARD",
   BOOKING = "BOOKING",
   SCHEMA = "SCHEMA",
@@ -51,7 +51,7 @@ const App: React.FC = () => {
   const renderContent = () => {
     switch (activeTab) {
       case Tab.DASHBOARD:
-        return <Dashboard />;
+        return <Dashboard onTabChange={handleTabChange} />;
       case Tab.BOOKING:
         return <Booking />;
       case Tab.SCHEMA:

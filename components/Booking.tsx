@@ -1,26 +1,20 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Calendar as CalendarIcon, Car, User, CreditCard, ChevronRight, CheckCircle2, ShieldCheck, Loader2, Info, AlertCircle } from 'lucide-react';
 import { loadStripe } from '@stripe/stripe-js';
 import { Elements, CardElement, useStripe, useElements } from '@stripe/react-stripe-js';
 import { format, addDays, isSameDay, isBefore, startOfToday } from 'date-fns';
 import { DayPicker, DateRange } from 'react-day-picker';
 import 'react-day-picker/dist/style.css';
+import { Vehicle, VehicleStatus } from '../types';
 
 const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY || 'pk_test_TYooMQauvdEDq54NiTphI7jx');
-
-const VEHICLES = [
-  { id: 1, name: 'Premium SUV', make: 'Range Rover', model: 'Velar', desc: 'Range Rover Velar or similar', price: 180, seats: 5, trans: 'Auto', image: 'https://picsum.photos/seed/velar/400/250' },
-  { id: 2, name: 'Luxury Sedan', make: 'Mercedes-Benz', model: 'E-Class', desc: 'Mercedes-Benz E-Class', price: 150, seats: 5, trans: 'Auto', image: 'https://picsum.photos/seed/eclass/400/250' },
-  { id: 3, name: 'Sports Coupe', make: 'Porsche', model: '911 Carrera', desc: 'Porsche 911 Carrera', price: 350, seats: 2, trans: 'Auto', image: 'https://picsum.photos/seed/porsche/400/250' },
-  { id: 4, name: 'Electric Executive', make: 'Tesla', model: 'Model S', desc: 'Tesla Model S Plaid', price: 220, seats: 5, trans: 'Auto', image: 'https://picsum.photos/seed/tesla/400/250' }
-];
 
 const BookingContent: React.FC = () => {
   const stripe = useStripe();
   const elements = useElements();
   const [isProcessing, setIsProcessing] = useState(false);
   const [step, setStep] = useState(1);
-  const [isHovered, setIsHovered] = useState<number | null>(null);
+  const [isHovered, setIsHovered] = useState<string | null>(null);
   const [bookingDetails, setBookingDetails] = useState<any>(null);
   const [paymentError, setPaymentError] = useState<string | null>(null);
   const [saveCard, setSaveCard] = useState(false);
@@ -29,8 +23,20 @@ const BookingContent: React.FC = () => {
     from: new Date(2023, 9, 25),
     to: new Date(2023, 9, 30)
   });
-  const [selectedVehicleId, setSelectedVehicleId] = useState<number>(1);
+  const [vehicles, setVehicles] = useState<Vehicle[]>([]);
+  const [selectedVehicleId, setSelectedVehicleId] = useState<string>("");
   
+  useEffect(() => {
+    fetch('/api/vehicles')
+      .then(res => res.json())
+      .then(data => {
+        const available = data.filter((v: Vehicle) => v.status === VehicleStatus.AVAILABLE);
+        setVehicles(available);
+        if (available.length > 0) setSelectedVehicleId(available[0].id);
+      })
+      .catch(err => console.error("Error fetching vehicles:", err));
+  }, []);
+
   const [clientInfo, setClientInfo] = useState({
     firstName: '',
     lastName: '',
@@ -38,7 +44,7 @@ const BookingContent: React.FC = () => {
     license: ''
   });
 
-  const selectedVehicle = VEHICLES.find(v => v.id === selectedVehicleId) || VEHICLES[0];
+  const selectedVehicle = vehicles.find(v => v.id === selectedVehicleId) || vehicles[0];
   
   const calculateDuration = () => {
     if (!dateRange?.from || !dateRange?.to) return 1;
@@ -48,7 +54,7 @@ const BookingContent: React.FC = () => {
   };
 
   const durationDays = calculateDuration();
-  const subtotal = durationDays * selectedVehicle.price;
+  const subtotal = selectedVehicle ? durationDays * selectedVehicle.dailyRate : 0;
   const taxes = subtotal * 0.1;
   const total = subtotal + taxes;
 
@@ -167,7 +173,7 @@ const BookingContent: React.FC = () => {
               {step === 2 && (
                 <div className="p-6 space-y-5 animate-in slide-in-from-top-2 duration-300">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {VEHICLES.map((v) => (
+                    {vehicles.map((v) => (
                       <div 
                         key={v.id}
                         onMouseEnter={() => setIsHovered(v.id)}
@@ -177,13 +183,13 @@ const BookingContent: React.FC = () => {
                       >
                         <div className="flex justify-between items-start mb-3">
                           <div>
-                            <h4 className="font-semibold text-zinc-900">{v.name}</h4>
-                            <p className="text-xs text-zinc-500 mt-0.5">{v.desc}</p>
+                            <h4 className="font-semibold text-zinc-900">{v.make} {v.model}</h4>
+                            <p className="text-xs text-zinc-500 mt-0.5">{v.year} • {v.fuelType}</p>
                           </div>
-                          <span className="text-sm font-bold text-zinc-900">${v.price}<span className="text-xs font-normal text-zinc-500">/day</span></span>
+                          <span className="text-sm font-bold text-zinc-900">${v.dailyRate}<span className="text-xs font-normal text-zinc-500">/day</span></span>
                         </div>
                         <div className="mt-4 flex gap-2">
-                          <span className="text-[10px] font-medium uppercase tracking-wider bg-white border border-zinc-200 text-zinc-600 px-2 py-1 rounded-md shadow-sm">{v.trans}</span>
+                          <span className="text-[10px] font-medium uppercase tracking-wider bg-white border border-zinc-200 text-zinc-600 px-2 py-1 rounded-md shadow-sm">{v.transmission}</span>
                           <span className="text-[10px] font-medium uppercase tracking-wider bg-white border border-zinc-200 text-zinc-600 px-2 py-1 rounded-md shadow-sm">{v.seats} Seats</span>
                         </div>
                       </div>
@@ -449,8 +455,8 @@ const BookingContent: React.FC = () => {
               
               <div className="aspect-video w-full overflow-hidden bg-zinc-100 border-b border-zinc-100">
                 <img 
-                  src={selectedVehicle.image} 
-                  alt={selectedVehicle.name}
+                  src={selectedVehicle?.image} 
+                  alt={selectedVehicle?.model}
                   className="w-full h-full object-cover"
                   referrerPolicy="no-referrer"
                 />
@@ -467,8 +473,8 @@ const BookingContent: React.FC = () => {
                 
                 <div className="space-y-1.5">
                   <p className="text-[10px] text-zinc-500 uppercase tracking-wider font-bold">Vehicle</p>
-                  <p className="text-sm font-medium text-zinc-900">{selectedVehicle.make} {selectedVehicle.model}</p>
-                  <p className="text-xs text-zinc-500">${selectedVehicle.price.toFixed(2)} / day</p>
+                  <p className="text-sm font-medium text-zinc-900">{selectedVehicle?.make} {selectedVehicle?.model}</p>
+                  <p className="text-xs text-zinc-500">${selectedVehicle?.dailyRate?.toFixed(2)} / day</p>
                 </div>
 
                 <div className="pt-5 border-t border-zinc-100 space-y-3">

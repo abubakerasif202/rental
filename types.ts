@@ -22,6 +22,8 @@ export interface Vehicle {
   seats: number;
   tankCapacity: number; // in liters
   features: string[];
+  image?: string;
+  dailyRate: number;
 }
 
 export interface Rental {

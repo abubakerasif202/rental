@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { VehicleStatus, Vehicle, Rental } from "../types";
 import { useLoading } from "../context/LoadingContext";
 import RentalClosureModal from "./RentalClosureModal";
+import { Tab } from "../App";
 
 // Modular Components
 import StatCards from "./dashboard/StatCards";
@@ -13,7 +14,7 @@ import MaintenanceCenter from "./dashboard/MaintenanceCenter";
 import RecentActivity from "./dashboard/RecentActivity";
 import QuickActions from "./dashboard/QuickActions";
 
-const Dashboard: React.FC = () => {
+const Dashboard: React.FC<{ onTabChange: (tab: Tab) => void }> = ({ onTabChange }) => {
   const { withLoading } = useLoading();
   
   // Data State
@@ -168,7 +169,7 @@ const Dashboard: React.FC = () => {
         </div>
 
         <div className="space-y-6">
-          <QuickActions />
+          <QuickActions onNewBooking={() => onTabChange(Tab.BOOKING)} />
           <ActionCenter alerts={alerts} overdueRentals={overdueRentals} />
         </div>
       </div>

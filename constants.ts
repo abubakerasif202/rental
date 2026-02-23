@@ -220,6 +220,8 @@ export const MOCK_VEHICLES: Vehicle[] = [
     seats: 5,
     tankCapacity: 60,
     features: ["GPS", "Bluetooth", "Reverse Camera"],
+    image: "https://picsum.photos/seed/camry/400/250",
+    dailyRate: 120,
   },
   {
     id: "2",
@@ -238,6 +240,8 @@ export const MOCK_VEHICLES: Vehicle[] = [
     seats: 5,
     tankCapacity: 50,
     features: ["Apple CarPlay", "Android Auto", "Lane Assist"],
+    image: "https://picsum.photos/seed/i30/400/250",
+    dailyRate: 95,
   },
   {
     id: "3",
@@ -256,6 +260,8 @@ export const MOCK_VEHICLES: Vehicle[] = [
     seats: 5,
     tankCapacity: 75,
     features: ["Autopilot", "Glass Roof", "Premium Audio", "GPS"],
+    image: "https://picsum.photos/seed/tesla3/400/250",
+    dailyRate: 210,
   },
   {
     id: "4",
@@ -274,6 +280,8 @@ export const MOCK_VEHICLES: Vehicle[] = [
     seats: 5,
     tankCapacity: 80,
     features: ["4WD", "Tow Bar", "Snorkel", "GPS"],
+    image: "https://picsum.photos/seed/ranger/400/250",
+    dailyRate: 145,
   },
   {
     id: "5",
@@ -292,6 +300,8 @@ export const MOCK_VEHICLES: Vehicle[] = [
     seats: 8,
     tankCapacity: 72,
     features: ["Child Seat Anchors", "Dual Sunroof", "Power Sliding Doors"],
+    image: "https://picsum.photos/seed/carnival/400/250",
+    dailyRate: 175,
   },
   {
     id: "6",
@@ -310,6 +320,8 @@ export const MOCK_VEHICLES: Vehicle[] = [
     seats: 5,
     tankCapacity: 43,
     features: ["GPS", "Hybrid Drive", "Keyless Entry"],
+    image: "https://picsum.photos/seed/corolla/400/250",
+    dailyRate: 85,
   },
 ];
 
